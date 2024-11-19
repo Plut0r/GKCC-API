@@ -8,7 +8,7 @@ import express from "express";
 const app = express();
 
 // rest of the packages
-import morgan from "morgan";
+// import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import rateLimit from "express-rate-limit";
 import cors from "cors";
