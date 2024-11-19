@@ -15,20 +15,10 @@ export const createEbook = async (req: Request, res: Response) => {
   }
 
   // Access uploaded files' URLs from req.files
+  // @ts-ignore
   const coverImgUrl = req.files.cover_img[0].path;
+  // @ts-ignore
   const ebookFileUrl = req.files.ebook_file[0].path;
-
-  // Upload cover image
-  // const coverImgResult = await cloudinary.uploader.upload(
-  //   req.files.cover_img[0].path,
-  //   { folder: "ebooks/cover_images", resource_type: "image" }
-  // );
-
-  // Upload ebook file
-  // const ebookFileResult = await cloudinary.uploader.upload(
-  //   req.files.ebook_file[0].path,
-  //   { folder: "ebooks/files", resource_type: "raw" }
-  // );
 
   const ebook = await Ebook.create({
     title,
