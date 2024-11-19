@@ -28,6 +28,14 @@ export const getPolicy = async (req: Request, res: Response) => {
 
 export const updatePolicy = async (req: Request, res: Response) => {
   const { id: policyId } = req.params;
+  const { type } = req.body;
+
+  const existingPolicy = await Policy.findOne({ type });
+  if (existingPolicy && existingPolicy._id.toString()!== policyId) {
+    throw new CustomError.BadRequestError(
+      `Policy of type ${type} already exists.`
+    );
+  }
 
   const policy = await Policy.findOneAndUpdate({ _id: policyId }, req.body, {
     new: true,

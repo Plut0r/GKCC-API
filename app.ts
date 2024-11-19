@@ -10,7 +10,11 @@ const app = express();
 // rest of the packages
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
+import rateLimit from "express-rate-limit";
 import cors from "cors";
+import helmet from "helmet";
+import xss from "xss-clean";
+import mongoSanitize from "express-mongo-sanitize";
 
 // database
 import connectDB from "./db/connect";
@@ -27,15 +31,21 @@ import ebookRouter from "./routes/ebookRoutes";
 import notFoundMiddleware from "./middleware/not-found";
 import errorHanlderMiddleware from "./middleware/error-handler";
 
-app.use(morgan("tiny"));
+// app.use(morgan("tiny"));
+
+app.use(
+  rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 60, // limit each IP to 60 requests per windowMs
+  })
+);
+app.use(cors());
+app.use(helmet());
+app.use(xss());
+app.use(mongoSanitize());
+
 app.use(express.json());
 app.use(cookieParser(process.env.JWT_SECRET));
-app.use(cors());
-
-app.get("/", (req, res) => {
-  console.log(req.signedCookies);
-  res.send("GKCC api");
-});
 
 app.use("/api/v1/auth", userAuthRouter);
 app.use("/api/v1/admin/auth", adminAuthRouter);
