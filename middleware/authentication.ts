@@ -29,9 +29,6 @@ const authenticateUser = async (
       role: payload.role,
     };
 
-    // @ts-ignore
-    console.log(req.user);
-
     next();
   } catch (error) {
     console.error(error);

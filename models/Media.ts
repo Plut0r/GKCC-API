@@ -6,6 +6,11 @@ const MediaSchema = new mongoose.Schema({
     trim: true,
     required: [true, "Please provide media title"],
   },
+  description: {
+    type: String,
+    default: 'No description provided',
+    maxlength: [500, "Description can not be more than 500 characters"],
+  },
   link: {
     type: String,
     required: [true, "Please provide media link"],

@@ -34,6 +34,16 @@ const EbookSchema = new mongoose.Schema({
     type: String,
     required: [true, "Please provide ebook pdf file"],
   },
+  sales: {
+    type: Number,
+    default: 0,
+    required: [true, "Please provide the number of sales"],
+  },
+  revenue: {
+    type: Number,
+    default: 0,
+    required: [true, "Please provide the revenue generated from the ebook"],
+  },
 });
 
 export default mongoose.model("Ebook", EbookSchema);

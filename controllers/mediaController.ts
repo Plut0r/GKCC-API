@@ -4,7 +4,7 @@ import CustomError from "../errors";
 import { Request, Response } from "express";
 
 export const createMedia = async (req: Request, res: Response) => {
-  const { title, link, type } = req.body;
+  const { type } = req.body;
 
   const existingMedia = await Media.findOne({ type });
   if (existingMedia) {
@@ -13,7 +13,7 @@ export const createMedia = async (req: Request, res: Response) => {
     );
   }
 
-  const media = await Media.create({ title, link, type });
+  const media = await Media.create(req.body);
   res.status(StatusCodes.CREATED).json({ media });
 };
 

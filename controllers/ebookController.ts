@@ -4,6 +4,7 @@ import CustomError from "../errors";
 import { Request, Response } from "express";
 import User from "../models/User";
 import PurchasedEbook from "../models/PurchasedEbook";
+import cloudinary from "../utils/cloudinaryConfig";
 
 export const createEbook = async (req: Request, res: Response) => {
   const { title, description, tags, free, price } = req.body;
@@ -96,12 +97,21 @@ export const updateEbook = async (req: Request, res: Response) => {
 export const deleteEbook = async (req: Request, res: Response) => {
   const { id: ebookId } = req.params;
 
-  const ebook = await Ebook.findByIdAndDelete({
-    _id: ebookId,
-  });
+  const ebook = await Ebook.findById(ebookId);
   if (!ebook) {
     throw new CustomError.NotFoundError(`No ebook with id: ${ebookId}`);
   }
+
+  // Delete cover image and ebook file from Cloudinary
+  await cloudinary.uploader.destroy(ebook.cover_img, {
+    resource_type: "image",
+  });
+  await cloudinary.uploader.destroy(ebook.ebook_file, {
+    resource_type: "raw",
+  });
+
+  // Delete the ebook document from the database
+  await Ebook.findByIdAndDelete(ebookId);
 
   res.status(StatusCodes.OK).json({ msg: "Success! Ebook removed." });
 };
@@ -138,8 +148,13 @@ export const markEbookAsPaid = async (req: Request, res: Response) => {
   user.purchasedEbooks += 1;
   user.totalRevenueGenerated += ebook.price;
 
+  // Update ebook's sales and revenue
+  ebook.sales += 1;
+  ebook.revenue += ebook.price;
+
   // Save the updated user
   await user.save();
+  await ebook.save();
   await purchasedEbook.save();
 
   res.status(StatusCodes.OK).json({
@@ -162,4 +177,15 @@ export const getPurchasedEbooks = async (req: Request, res: Response) => {
   });
 
   res.status(StatusCodes.OK).json({ purchasedEbooks });
+};
+
+export const getTopFiveSellingEbooks = async (req: Request, res: Response) => {
+  const topSellingEbooks = await Ebook.aggregate([
+    { $sort: { sales: -1 } },
+    // Sort by sales in descending order
+    { $limit: 5 },
+    // Limit to 5 results
+  ]);
+
+  res.status(StatusCodes.OK).json({ topSellingEbooks });
 };
