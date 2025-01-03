@@ -47,6 +47,10 @@ app.use(mongoSanitize());
 app.use(express.json());
 app.use(cookieParser(process.env.JWT_SECRET));
 
+app.get('/', (req, res) => {
+  res.send('<h1>GKCC API</h1>');
+});
+
 app.use("/api/v1/auth", userAuthRouter);
 app.use("/api/v1/admin/auth", adminAuthRouter);
 app.use("/api/v1/users", userRouter);
